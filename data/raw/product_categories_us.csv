@@ -1,0 +1,60 @@
+,name,id
+0,All Departments,aps
+1,Alexa Skills,alexa-skills
+2,Amazon Devices,amazon-devices
+3,Amazon Explore,live-explorations
+4,Amazon Fresh,amazonfresh
+5,Amazon Pharmacy,amazon-pharmacy
+6,Amazon Warehouse,warehouse-deals
+7,Appliances,appliances
+8,Apps & Games,mobile-apps
+9,"Arts, Crafts & Sewing",arts-crafts
+10,Audible Books & Originals,audible
+11,Automotive Parts & Accessories,automotive
+12,AWS Courses,courses
+13,Baby,baby-products
+14,Beauty & Personal Care,beauty
+15,Books,stripbooks
+16,CDs & Vinyl,popular
+17,Cell Phones & Accessories,mobile
+18,"Clothing, Shoes & Jewelry",fashion
+19,   Women,fashion-womens
+20,   Men,fashion-mens
+21,   Girls,fashion-girls
+22,   Boys,fashion-boys
+23,   Baby,fashion-baby
+24,Collectibles & Fine Art,collectibles
+25,Computers,computers
+26,Credit and Payment Cards,financial
+27,Digital Educational Resources,edu-alt-content
+28,Digital Music,digital-music
+29,Electronics,electronics
+30,Garden & Outdoor,lawngarden
+31,Gift Cards,gift-cards
+32,Grocery & Gourmet Food,grocery
+33,Handmade,handmade
+34,"Health, Household & Baby Care",hpc
+35,Home & Business Services,local-services
+36,Home & Kitchen,garden
+37,Industrial & Scientific,industrial
+38,Just for Prime,prime-exclusive
+39,Kindle Store,digital-text
+40,Luggage & Travel Gear,fashion-luggage
+41,Luxury Stores,luxury
+42,Magazine Subscriptions,magazines
+43,Movies & TV,movies-tv
+44,Musical Instruments,mi
+45,Office Products,office-products
+46,Pet Supplies,pets
+47,Premium Beauty,luxury-beauty
+48,Prime Video,instant-video
+49,Smart Home,smart-home
+50,Software,software
+51,Sports & Outdoors,sporting
+52,Subscribe & Save,specialty-aps-sns
+53,Subscription Boxes,subscribe-with-amazon
+54,Tools & Home Improvement,tools
+55,Toys & Games,toys-and-games
+56,Under $10,under-ten-dollars
+57,Video Games,videogames
+58,Whole Foods Market,wholefoods
