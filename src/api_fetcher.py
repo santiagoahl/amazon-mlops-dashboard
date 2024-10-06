@@ -7,7 +7,7 @@ import os
 class ApiClient():
     def __init__(self) -> None:
         self.response = None
-        self.output_dir = "./raw-data/"
+        self.output_dir = "../data/api-calls"
         self.output_path = None
 
     def http_request(
@@ -49,7 +49,7 @@ class ApiClient():
         
         self.response = data_json
         
-        return None
+        return data_json
 
     def save_response(self, filename: str) -> None:   
         """
@@ -68,9 +68,8 @@ class ApiClient():
                 f"The response with type {type(self.response)} has an error." 
                 "Try running self.http_request() first"
             )
-        
-        output_dir = "./raw-data"
-        output_path = os.path.join(output_dir, filename + ".json")
+                
+        output_path = os.path.join(self.output_dir, filename + ".json")
 
         # Save the results
         with open(file=output_path, mode="w") as file:
