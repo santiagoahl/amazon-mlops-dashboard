@@ -32,7 +32,7 @@ class ApiClient():
 
         headers = {
             'x-rapidapi-key': "dfa8842b83msha2bc48dbc5792bdp1cbbd0jsn0bde68569041",
-            'x-rapidapi-host': "real-time-amazon-data.p.rapidapi.com"
+            'x-rapidapi-host': "real-time-amazon-data.p.rapidapi.com"            
         }
 
         conn.request(method=method, url=request_url, headers=headers)
