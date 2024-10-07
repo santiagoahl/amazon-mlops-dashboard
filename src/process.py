@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 
 
 @task
-def get_raw_data(data_location: str) -> pd.DataFrame -> pd.DataFrame -> pd.DataFrame:
+def get_raw_data(data_location: str) -> pd.DataFrame:
     """Read raw data
 
     Parameters
@@ -17,6 +17,25 @@ def get_raw_data(data_location: str) -> pd.DataFrame -> pd.DataFrame -> pd.DataF
         The location of the raw data
     """
     return pd.read_csv(data_location)
+
+@task
+def gaussian_noise_sales(df: pd.Series) -> pd.Seres|:   
+    """
+    Description.
+
+    Args:
+        arg1 (type): .
+        arg2 (type): .
+        arg3 (type): .
+    
+    Returns:
+        type:
+    
+    Example:
+        >>> ('arg1', 'arg2')
+        'output'
+    """
+    return None
 
 
 @task
