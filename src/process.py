@@ -5,6 +5,9 @@ import pandas as pd
 from config import Location, ProcessConfig
 from prefect import flow, task
 from sklearn.model_selection import train_test_split
+from typing import *
+from scipy.stats import norm
+import re
 
 
 @task
@@ -19,24 +22,90 @@ def get_raw_data(data_location: str) -> pd.DataFrame:
     return pd.read_csv(data_location)
 
 @task
-def gaussian_noise_sales(df: pd.Series) -> pd.Seres|:   
+def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:   
     """
-    Description.
+    Modifies data by adding Gaussian Noise depending on the noise that is desired to be added.
 
     Args:
-        arg1 (type): .
-        arg2 (type): .
-        arg3 (type): .
+        df (pd.Series|pd.DataFrame): Data to be transformed.
+        targe_column (str): Column to be transformed with Gaussian Noise
     
     Returns:
-        type:
+        pd.DataFrame: Dataframe with Gaussian Noise implemented 
     
     Example:
-        >>> ('arg1', 'arg2')
-        'output'
+        >>> gaussian_noise(
+                df=pd.DataFrame([
+                    '50+ bought in past month', '200+ bought in past month'
+                    ]),
+                target_column="sales_volume"
+            )
+        pd.DataFrame([78, 354])
     """
-    return None
+    
+    # Mean and variance to add Gaussian Noise
+    noise_mapping = {
+        'No featured offers available': [30, 30 * 0.5],
+        '50+ bought in past month': [50, 50 * 0.5],
+        '100+ bought in past month': [100, 100 * 0.5],
+        'List: ': [30, 30 * 0.5],
+        '200+ bought in past month': [100, 100 * 0.5],
+        '300+ bought in past month': [200, 200 * 0.5],
+        None: [30, 30 * 0.5],
+        '500+ bought in past month': [300, 300 * 0.5],
+        '800+ bought in past month': [100, 100 * 0.5],
+        '900+ bought in past month': [100, 100 * 0.5],
+        '1K+ bought in past month': [3000, 3000 * 0.5],
+        }
+    
+    # Define column names, these columns will help to add the Gaussian Noise
+    target_column_numerical = target_column + "_numerical"
+    target_column_cleaned = target_column + "_cleaned"
+    
+    #noises_mapping = {key: normal.rvs(loc=value[0], scale=value[1], sample)}
+    # Clean output variable -> Non-info values are supposed to be replaced by 0
 
+    df[target_column_cleaned] = df[target_column].map(
+        lambda value: '0' if value in [None, 'List: ', 'No featured offers available'] 
+        else value
+    )
+    
+    # Get the numerical values from the target_column 
+    target_column_vals = {
+        val_raw: re.search(pattern='\d+', string=val_raw).group() 
+        for val_raw in target_column_vals_raw
+    }
+    target_column_vals = {
+        key: 1000 if value == '1' else int(value) 
+        for key, value in target_column_vals.items()
+    }  
+    
+    # Generate Gaussian Noise for each possible key of the Noise Mapping
+    gaussian_noise_map = lambda cat_value: abs(norm.rvs(
+            loc=noise_mapping[cat_value][0],
+            scale=noise_mapping[cat_value][1],
+            size=1
+        )[0])
+    
+    
+    # Generate column with numerical values using the target column
+    df[[target_column_numerical]] = df[[target_column+"_cleaned"]].replace(target_column_vals) 
+    
+    # Generate Noise    
+    print(df[[target_column]].unique())
+    df['gaussian_noise'] = df[target_column].apply(gaussian_noise_map)
+    
+    # Redefine the target column adding Gaussian Noise
+    df[target_column] = df[target_column_numerical] + df['gaussian_noise']
+    
+    df[[target_column]] = df[[target_column]].map(lambda x: int(x))
+    
+    df.drop(
+        [target_column_numerical, "gaussian_noise", target_column_cleaned],
+        axis=1,
+        inplace=True
+    )
+    return df
 
 @task
 def drop_columns(data: pd.DataFrame, columns: list) -> pd.DataFrame:
