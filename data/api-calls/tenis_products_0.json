@@ -1,0 +1,1 @@
+{"method": "GET", "request_url": "/search?query=Tenis&country=US&sort_by=RELEVANCE&product_condition=ALL&page=0", "response": "{\"status\":\"ERROR\",\"request_id\":\"c9d9f9ad-cbd3-4211-803c-abf3a4776f1c\",\"error\":{\"message\":\"The page parameter should be a positive integer.\",\"code\":400}}"}
