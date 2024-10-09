@@ -1,6 +1,7 @@
 """Python script to process the data"""
 
 import joblib
+import json
 import pandas as pd
 from config import Location, ProcessConfig
 from prefect import flow, task
@@ -21,10 +22,132 @@ def get_raw_data(data_location: str) -> pd.DataFrame:
     """
     return pd.read_csv(data_location)
 
+
+@task
+def clean_data(df: pd.DataFrame) -> pd.DataFrame:   
+    """
+    Cleans and prepares dataframe to make predictions.
+
+    Args:
+        df (pd.DataFrame): Raw data to be cleaned.
+    
+    Returns:
+        pd.DataFrame
+    
+    Example:
+        >>> ('arg1', 'arg2')
+        'output'
+    """
+    
+    # Process price format
+
+    df[['product_price']] = df[[
+        'product_price'
+        ]].map(lambda price_raw: float(price_raw[1:]) if price_raw != None else price_raw)
+
+    df[['product_original_price']] = df[[
+        'product_original_price'
+        ]].map(lambda price_raw: float(price_raw[1:]) if price_raw != None else price_raw)
+
+    df[['product_minimum_offer_price']] = df[[
+        'product_minimum_offer_price'
+        ]].map(lambda price_raw: float(price_raw[1:]) if price_raw != None else price_raw
+    )
+        
+        
+    # Convert to float
+
+    df['product_star_rating'] = df['product_star_rating'].astype(float);
+
+    df["coupon_discount"] = df["coupon_text"].map(
+        lambda coupon_txt: 
+            re.search(pattern="\d{1,2}(\.+\d{1,2})*", string=coupon_txt).group()
+            if type(coupon_txt) != float
+            else '0.0'
+    )
+
+    # conver to float
+
+    df['coupon_discount'] = df['coupon_discount'].map(
+        lambda discount_str: float(discount_str)
+    ) 
+
+    df.drop(labels=["coupon_text"], axis=1);
+
+    # Process categorical data
+
+    df["is_prime"] = pd.get_dummies(
+        df["is_prime"], 
+        dtype=float
+        )[True]
+
+    df["climate_pledge_friendly"] = pd.get_dummies(
+        df["climate_pledge_friendly"], 
+        dtype=float
+        )[True]
+
+    df["has_variations"] = pd.get_dummies(
+        df["has_variations"], 
+        dtype=float
+        )[True]
+
+    # Reorder columns to leave the predict variable at the end
+    
+    input_cols = [
+        'product_price',
+        'product_original_price',
+        'product_star_rating',
+        'product_num_ratings',
+        'product_minimum_offer_price',
+        'is_prime',
+        'climate_pledge_friendly',
+        'has_variations',
+        'coupon_discount'
+    ]
+
+    df = df[
+        input_cols  + ['sales_volume']
+        ]
+    # Imputation of null values
+    df[input_cols] = df[input_cols].fillna(0.0)
+    return df
+
+@task
+def extract_json_df(json_file_paths: list) -> pd.DataFrame:   
+    """
+    Collects a list of json files, extracts the data and merges it.
+
+    Args:
+        json_file_paths (list): Files to examinate.
+    
+    Returns:
+        pd.DataFrame: Merged data
+    
+    Example:
+        >>> extract_json_df("../data/api-calls/tenis_products_49.json")
+        pd.DataFrame
+    """
+    json_files = []
+    
+    for filepath in json_file_paths:
+        with open(filepath, 'r') as f:
+            json_files.append(
+                json.load(f)
+            )
+        
+    dataframes_list = [
+        pd.DataFrame(json.loads(file['response'])['data']['products']) 
+        for file in json_files
+    ]
+    
+    data_merged = pd.concat(dataframes_list)
+    
+    return data_merged
+
 @task
 def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:   
     """
-    Modifies data by adding Gaussian Noise depending on the noise that is desired to be added.
+    Modifies data by adding Gaussian Noise depending on the noise that is desired to be added
 
     Args:
         df (pd.Series|pd.DataFrame): Data to be transformed.
@@ -45,36 +168,44 @@ def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:
     
     # Mean and variance to add Gaussian Noise
     noise_mapping = {
+        None: [30, 30 * 0.5],
+        'List: ': [30, 30 * 0.5],
+        '0': [30, 30 * 0.5],
         'No featured offers available': [30, 30 * 0.5],
         '50+ bought in past month': [50, 50 * 0.5],
         '100+ bought in past month': [100, 100 * 0.5],
-        'List: ': [30, 30 * 0.5],
         '200+ bought in past month': [100, 100 * 0.5],
-        '300+ bought in past month': [200, 200 * 0.5],
-        None: [30, 30 * 0.5],
-        '500+ bought in past month': [300, 300 * 0.5],
+        '300+ bought in past month': [100, 100 * 0.5],
+        '400+ bought in past month': [100, 100 * 0.5],
+        '500+ bought in past month': [200, 200 * 0.5],
+        '700+ bought in past month': [100, 100 * 0.5],
         '800+ bought in past month': [100, 100 * 0.5],
         '900+ bought in past month': [100, 100 * 0.5],
-        '1K+ bought in past month': [3000, 3000 * 0.5],
+        '1K+ bought in past month': [3000, 3000 * 0.5]
         }
     
     # Define column names, these columns will help to add the Gaussian Noise
     target_column_numerical = target_column + "_numerical"
     target_column_cleaned = target_column + "_cleaned"
+    gaussian_noise_column = "gaussian_noise"
     
     #noises_mapping = {key: normal.rvs(loc=value[0], scale=value[1], sample)}
     # Clean output variable -> Non-info values are supposed to be replaced by 0
 
     df[target_column_cleaned] = df[target_column].map(
-        lambda value: '0' if value in [None, 'List: ', 'No featured offers available'] 
-        else value
+        lambda value: value if re.match(pattern='\d+', string=str(value))
+        else '0'
     )
+    
+    target_column_vals_raw = list(df[target_column_cleaned].unique())
     
     # Get the numerical values from the target_column 
     target_column_vals = {
         val_raw: re.search(pattern='\d+', string=val_raw).group() 
         for val_raw in target_column_vals_raw
     }
+    
+    # Fix issue with 1K value to prevent it to be replaced by 1 instead of 1000
     target_column_vals = {
         key: 1000 if value == '1' else int(value) 
         for key, value in target_column_vals.items()
@@ -89,19 +220,18 @@ def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:
     
     
     # Generate column with numerical values using the target column
-    df[[target_column_numerical]] = df[[target_column+"_cleaned"]].replace(target_column_vals) 
+    df[[target_column_numerical]] = df[[target_column_cleaned]].replace(target_column_vals) 
     
     # Generate Noise    
-    print(df[[target_column]].unique())
-    df['gaussian_noise'] = df[target_column].apply(gaussian_noise_map)
+    df[gaussian_noise_column] = df[target_column_cleaned].apply(gaussian_noise_map)
     
     # Redefine the target column adding Gaussian Noise
-    df[target_column] = df[target_column_numerical] + df['gaussian_noise']
+    df[target_column] = df[target_column_numerical] + df[gaussian_noise_column]
     
     df[[target_column]] = df[[target_column]].map(lambda x: int(x))
     
     df.drop(
-        [target_column_numerical, "gaussian_noise", target_column_cleaned],
+        [target_column_numerical, gaussian_noise_column, target_column_cleaned],
         axis=1,
         inplace=True
     )
