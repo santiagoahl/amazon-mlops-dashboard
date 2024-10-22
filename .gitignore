@@ -1,8 +1,11 @@
 # Ignore virtual env
 venv/
 
-# Ignore mlflow runs
+# Ignore mlflow modules
 mlruns/
+mlartifacts/
+tennis-forecast-ensemble/
+.vscode/
 
 
 # Ignore python files
