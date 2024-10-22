@@ -1,6 +1,10 @@
 # Ignore virtual env
 venv/
 
+# Ignore mlflow runs
+mlruns/
+
+
 # Ignore python files
 __pycache__/
 *.pyc
@@ -10,7 +14,7 @@ __pycache__/
 *.egg-info/
 
 # Ignore images
-*.jpg
+*.jpggit 
 *.jpeg
 *.png
 *.gif
