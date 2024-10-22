@@ -1,15 +1,23 @@
 """Python script to process the data"""
 
-import joblib
-import json
-import pandas as pd
 from config import Location, ProcessConfig
 from prefect import flow, task
-from sklearn.model_selection import train_test_split
-from typing import *
-from scipy.stats import norm
-import re
 
+# File Management
+import joblib
+import json
+
+# Machine Learning Modules
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_absolute_error, root_mean_squared_error
+
+# Data and numerical processing
+from scipy.stats import norm
+import pandas as pd
+import numpy as np
+
+from typing import *
+import re
 
 @task
 def get_raw_data(data_location: str) -> pd.DataFrame:
@@ -22,6 +30,44 @@ def get_raw_data(data_location: str) -> pd.DataFrame:
     """
     return pd.read_csv(data_location)
 
+@task
+def evaluate_regression_model(
+        model, 
+        y_true: Union[np.array, pd.Series], 
+        y_pred: Union[np.array, pd.Series]
+    ) -> dict:   
+    """
+    Save the performance of a (fitted) regression model leveraging R2, MSE, RMSE and MAE metrics.
+
+    Args:
+        model (abc.ABCMeta): Fitted model.
+        y_pred (np.array | pd.Series): Model predictions.
+        y_true (np.array | pd.Series): Actual values.
+    
+    Returns:
+        dict: Performance metrics
+    
+    Example:
+        >>> evaluate_regression_model(
+                model=lasso_regressor,
+                y_pred=y_pred,
+                y_true=y_val
+            )
+        {'r2': -0.04734884276611817,
+        'mae': np.float64(83.54344966689207),
+        'mse': np.float64(16866.74842992118),
+        'rmse': np.float64(129.87204637612044)}
+
+    """
+    
+    performance_metrics = {
+        "r2": r2_score(y_true, y_pred), 
+        "mae": mean_absolute_error(y_true, y_pred),
+        "mse": root_mean_squared_error(y_true, y_pred) ** 2,
+        "rmse": root_mean_squared_error(y_true, y_pred)
+    }
+    
+    return performance_metrics
 
 @task
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:   
@@ -289,6 +335,27 @@ def split_train_test(X: pd.DataFrame, y: pd.DataFrame, test_size: int):
         "y_train": y_train,
         "y_test": y_test,
     }
+    
+@task
+def augment_data(df: pd.DataFrame, scale: float = 1.0) -> pd.DataFrame:   
+    """
+    Creates synthetic samples using KDE.
+
+    Args:
+        df (pd.DataFrame): DataFrame to increase samples.
+        scale (float): Augmentation multiplier, default 1.0. Use float numbers
+            greater or equal than 1.0 to augment the number of samples, 2.0 to 
+            duplicate and so on.
+    
+    Returns:
+        pd.DataFrame: Augmented data
+    
+    Example:
+        >>> 
+    """
+    
+    
+    return aug_df
 
 
 @task

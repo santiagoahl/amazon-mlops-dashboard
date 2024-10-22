@@ -1,0 +1,24 @@
+# Ignore virtual env
+venv/
+
+# Ignore python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.dist-info/
+*.egg-info/
+
+# Ignore images
+*.jpg
+*.jpeg
+*.png
+*.gif
+
+# Ignore temporal files
+*.log
+*.tmp
+*.bak
+
+# Ignore data
+data/*

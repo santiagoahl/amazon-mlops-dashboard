@@ -1,0 +1,15 @@
+artifact_uri: file:///home/santi/current-projects/public-apis/amazon-mlops-dashboard/notebooks/mlruns/0/d3e9122b51154041b053dacc2a69059f/artifacts
+end_time: 1728516719514
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: d3e9122b51154041b053dacc2a69059f
+run_name: linear-regression-model
+run_uuid: d3e9122b51154041b053dacc2a69059f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728516709213
+status: 3
+tags: []
+user_id: santi

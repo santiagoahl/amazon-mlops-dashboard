@@ -2,6 +2,10 @@
 
 ## Milestone 1: Get data
 
-* [ ] Get a scope of which data can be tracked
-  * [ ] Try out with 10 different api requests
-  * [ ] Save the outputs in `data/raw/`
+* [X] Get a scope of which data can be tracked
+  * [X] Try out with 10 different api requests
+  * [X] Save the outputs in `data/raw/`
+
+# Milestone 2: MLFlow Experimentation
+
+* [ ] Try out with XGB, LGBM

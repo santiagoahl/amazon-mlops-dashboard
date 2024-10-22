@@ -1,0 +1,17 @@
+artifact_path: gb-regression-tennis-forecast
+flavors:
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.5.2
+mlflow_version: 2.16.2
+model_size_bytes: 16831
+model_uuid: 95770d2fc37f4fe49bc4706442ed872c
+run_id: e18eeafbe1d84c4aa34fd5c72f4aadad
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+utc_time_created: '2024-10-10 16:23:01.189883'
