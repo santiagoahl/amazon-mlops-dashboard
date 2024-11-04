@@ -2,10 +2,10 @@
 name = "amazon-mlops-dashboard"
 version = "0.1.0"
 description = ""
-authors = ["salitas", "santiagoal"]
+authors = ["santiagoal"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 pdoc3 = "^0.10.0"
 notebook = "^6.4.10"
 prefect = "^2.7.6"
@@ -16,6 +16,8 @@ interrogate = "^1.5.0"
 joblib = "^1.2.0"
 datetime = "^5.5"
 pydantic = "^2.8.0"
+seaborn = "^0.13.2"
+statsmodels = "^0.14.4"
 
 
 [tool.poetry.dev-dependencies]
