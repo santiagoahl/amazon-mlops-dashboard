@@ -1,0 +1,181 @@
+.
+├── Makefile
+├── config
+├── data
+│   ├── api-calls
+│   │   ├── all_tenis_products.json
+│   │   ├── page_1_tenis_products.json
+│   │   ├── prod_details_us.json
+│   │   ├── product_list_us.json
+│   │   ├── tenis_products_0.json
+│   │   ├── tenis_products_1.json
+│   │   ├── tenis_products_10.json
+│   │   ├── tenis_products_11.json
+│   │   ├── tenis_products_12.json
+│   │   ├── tenis_products_13.json
+│   │   ├── tenis_products_14.json
+│   │   ├── tenis_products_15.json
+│   │   ├── tenis_products_16.json
+│   │   ├── tenis_products_17.json
+│   │   ├── tenis_products_18.json
+│   │   ├── tenis_products_19.json
+│   │   ├── tenis_products_2.json
+│   │   ├── tenis_products_20.json
+│   │   ├── tenis_products_21.json
+│   │   ├── tenis_products_22.json
+│   │   ├── tenis_products_23.json
+│   │   ├── tenis_products_24.json
+│   │   ├── tenis_products_25.json
+│   │   ├── tenis_products_26.json
+│   │   ├── tenis_products_27.json
+│   │   ├── tenis_products_28.json
+│   │   ├── tenis_products_29.json
+│   │   ├── tenis_products_3.json
+│   │   ├── tenis_products_30.json
+│   │   ├── tenis_products_31.json
+│   │   ├── tenis_products_32.json
+│   │   ├── tenis_products_33.json
+│   │   ├── tenis_products_34.json
+│   │   ├── tenis_products_35.json
+│   │   ├── tenis_products_36.json
+│   │   ├── tenis_products_37.json
+│   │   ├── tenis_products_38.json
+│   │   ├── tenis_products_39.json
+│   │   ├── tenis_products_4.json
+│   │   ├── tenis_products_40.json
+│   │   ├── tenis_products_41.json
+│   │   ├── tenis_products_42.json
+│   │   ├── tenis_products_43.json
+│   │   ├── tenis_products_44.json
+│   │   ├── tenis_products_45.json
+│   │   ├── tenis_products_46.json
+│   │   ├── tenis_products_47.json
+│   │   ├── tenis_products_48.json
+│   │   ├── tenis_products_49.json
+│   │   ├── tenis_products_5.json
+│   │   ├── tenis_products_6.json
+│   │   ├── tenis_products_7.json
+│   │   ├── tenis_products_8.json
+│   │   ├── tenis_products_9.json
+│   │   ├── tenis_products_all.json
+│   │   └── us_product_list.json
+│   ├── distributions
+│   │   ├── distributions.json
+│   │   └── distributions.pkl
+│   ├── historical
+│   │   └── 2024-10-06.csv
+│   ├── processed
+│   │   ├── tennis_2024-10-07.csv
+│   │   ├── tennis_augmented.csv
+│   │   └── tennis_merged.csv
+│   └── raw
+│       └── tenis_products_all_2024-10-06.csv
+├── docs
+├── images
+│   ├── github_actions.png
+│   └── prefect_cloud.png
+├── models
+├── notebooks
+│   ├── analyze_results.ipynb
+│   ├── data_augmentation.ipynb
+│   ├── distributions_estimation.ipynb
+│   ├── explore_api_output.ipynb
+│   ├── feature_engineering_and_regression.ipynb
+│   ├── format_data.ipynb
+│   ├── mlflow_tennis.ipynb
+│   ├── predict_tennis_demand.ipynb
+│   └── tennis_demand.ipynb
+├── poetry.lock
+├── project_structure.txt
+├── pyproject.toml
+├── src
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── api_fetcher.cpython-311.pyc
+│   │   ├── config.cpython-311.pyc
+│   │   └── process.cpython-311.pyc
+│   ├── api_fetcher.py
+│   ├── config.py
+│   ├── main.py
+│   ├── process.py
+│   ├── run_notebook.py
+│   ├── test.py
+│   └── train_model.py
+├── tennis-forecast-ensemble
+│   ├── 2661c6ca86c148ab9cebad820bf03136
+│   │   └── artifacts
+│   │       └── rf-regressor-tennis-demand
+│   │           ├── MLmodel
+│   │           ├── conda.yaml
+│   │           ├── input_example.json
+│   │           ├── model.pkl
+│   │           ├── python_env.yaml
+│   │           ├── requirements.txt
+│   │           └── serving_input_example.json
+│   ├── 39ee1b02541140daad49c0ce08e91d9c
+│   │   └── artifacts
+│   │       └── rf-regressor-tennis-demand
+│   │           ├── MLmodel
+│   │           ├── conda.yaml
+│   │           ├── input_example.json
+│   │           ├── model.pkl
+│   │           ├── python_env.yaml
+│   │           ├── requirements.txt
+│   │           └── serving_input_example.json
+│   ├── 44f06efaad5b4a919fa46eb445641c10
+│   │   └── artifacts
+│   │       └── rf-regressor-tennis-demand
+│   │           ├── MLmodel
+│   │           ├── conda.yaml
+│   │           ├── input_example.json
+│   │           ├── model.pkl
+│   │           ├── python_env.yaml
+│   │           ├── requirements.txt
+│   │           └── serving_input_example.json
+│   ├── 611f3032720548a9a35df7831a90b209
+│   │   └── artifacts
+│   │       └── gb-regression-tennis-forecast
+│   │           ├── MLmodel
+│   │           ├── conda.yaml
+│   │           ├── input_example.json
+│   │           ├── model.pkl
+│   │           ├── python_env.yaml
+│   │           ├── requirements.txt
+│   │           └── serving_input_example.json
+│   ├── 894993233cbd4b9d9e5a9ff7ecaa93ef
+│   │   └── artifacts
+│   │       └── gb-regression-tennis-forecast
+│   │           ├── MLmodel
+│   │           ├── conda.yaml
+│   │           ├── input_example.json
+│   │           ├── model.pkl
+│   │           ├── python_env.yaml
+│   │           ├── requirements.txt
+│   │           └── serving_input_example.json
+│   ├── ab5dbc09c3a348a2939f1b0b69252e03
+│   │   └── artifacts
+│   │       └── gb-regression-tennis-forecast
+│   │           ├── MLmodel
+│   │           ├── conda.yaml
+│   │           ├── input_example.json
+│   │           ├── model.pkl
+│   │           ├── python_env.yaml
+│   │           ├── requirements.txt
+│   │           └── serving_input_example.json
+│   └── e18eeafbe1d84c4aa34fd5c72f4aadad
+│       └── artifacts
+│           └── gb-regression-tennis-forecast
+│               ├── MLmodel
+│               ├── conda.yaml
+│               ├── input_example.json
+│               ├── model.pkl
+│               ├── python_env.yaml
+│               ├── requirements.txt
+│               └── serving_input_example.json
+├── tests
+│   ├── __init__.py
+│   ├── test_process.py
+│   └── test_train_model.py
+└── todo.md
+
+368 directories, 839 files

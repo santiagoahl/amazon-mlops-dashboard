@@ -1,4 +1,4 @@
-"""Python script to process the data"""
+# This script cleans, transforms and adds gaussian noise for oversampling purposes
 
 from config import Location, ProcessConfig
 from prefect import flow, task
@@ -30,46 +30,8 @@ def get_raw_data(data_location: str) -> pd.DataFrame:
     """
     return pd.read_csv(data_location)
 
-@task
-def evaluate_regression_model(
-        model, 
-        y_true: Union[np.array, pd.Series], 
-        y_pred: Union[np.array, pd.Series]
-    ) -> dict:   
-    """
-    Save the performance of a (fitted) regression model leveraging R2, MSE, RMSE and MAE metrics.
 
-    Args:
-        model (abc.ABCMeta): Fitted model.
-        y_pred (np.array | pd.Series): Model predictions.
-        y_true (np.array | pd.Series): Actual values.
-    
-    Returns:
-        dict: Performance metrics
-    
-    Example:
-        >>> evaluate_regression_model(
-                model=lasso_regressor,
-                y_pred=y_pred,
-                y_true=y_val
-            )
-        {'r2': -0.04734884276611817,
-        'mae': np.float64(83.54344966689207),
-        'mse': np.float64(16866.74842992118),
-        'rmse': np.float64(129.87204637612044)}
-
-    """
-    
-    performance_metrics = {
-        "r2": r2_score(y_true, y_pred), 
-        "mae": mean_absolute_error(y_true, y_pred),
-        "mse": root_mean_squared_error(y_true, y_pred) ** 2,
-        "rmse": root_mean_squared_error(y_true, y_pred)
-    }
-    
-    return performance_metrics
-
-@task
+@task 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:   
     """
     Cleans and prepares dataframe to make predictions.
@@ -158,6 +120,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df[input_cols] = df[input_cols].fillna(0.0)
     return df
 
+
 @task
 def extract_json_df(json_file_paths: list) -> pd.DataFrame:   
     """
@@ -189,6 +152,7 @@ def extract_json_df(json_file_paths: list) -> pd.DataFrame:
     data_merged = pd.concat(dataframes_list)
     
     return data_merged
+
 
 @task
 def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:   
@@ -283,6 +247,7 @@ def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:
     )
     return df
 
+
 @task
 def drop_columns(data: pd.DataFrame, columns: list) -> pd.DataFrame:
     """Drop unimportant columns
@@ -297,45 +262,6 @@ def drop_columns(data: pd.DataFrame, columns: list) -> pd.DataFrame:
     return data.drop(columns=columns)
 
 
-@task
-def get_X_y(data: pd.DataFrame, label: str):# -> tuple[DataFrame, Series]:
-    """Get features and label
-
-    Parameters
-    ----------
-    data : pd.DataFrame
-        Data to process
-    label : str
-        Name of the label
-    """
-    X = data.drop(columns=label)
-    y = data[label]
-    return X, y
-
-
-@task
-def split_train_test(X: pd.DataFrame, y: pd.DataFrame, test_size: int):
-    """_summary_
-
-    Parameters
-    ----------
-    X : pd.DataFrame
-        Features
-    y : pd.DataFrame
-        Target
-    test_size : int
-        Size of the test set
-    """
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=0
-    )
-    return {
-        "X_train": X_train,
-        "X_test": X_test,
-        "y_train": y_train,
-        "y_test": y_test,
-    }
-    
 @task
 def augment_data(df: pd.DataFrame, scale: float = 1.0) -> pd.DataFrame:   
     """
@@ -359,7 +285,7 @@ def augment_data(df: pd.DataFrame, scale: float = 1.0) -> pd.DataFrame:
 
 
 @task
-def save_processed_data(data: dict, save_location: str):
+def save_processed_data(data: dict, save_location: str) -> None:
     """Save processed data
 
     Parameters
@@ -370,28 +296,26 @@ def save_processed_data(data: dict, save_location: str):
         Where to save the data
     """
     joblib.dump(data, save_location)
+    
 
-
-@flow
-def process(
-    location: Location = Location(),
-    config: ProcessConfig = ProcessConfig(),
-):
-    """Flow to process the ata
-
-    Parameters
-    ----------
-    location : Location, optional
-        Locations of inputs and outputs, by default Location()
-    config : ProcessConfig, optional
-        Configurations for processing data, by default ProcessConfig()
+@task
+def main() -> None:   
     """
-    data = get_raw_data(location.data_raw)
-    processed = drop_columns(data, config.drop_columns)
-    X, y = get_X_y(processed, config.label)
-    split_data = split_train_test(X, y, config.test_size)
-    save_processed_data(split_data, location.data_process)
+    Description.
 
+    Args:
+        arg1 (type): .
+        arg2 (type): .
+        arg3 (type): .
+    
+    Returns:
+        type:
+    
+    Example:
+        >>> ('arg1', 'arg2')
+        'output'
+    """
+    pass
 
-if __name__ == "__main__":
-    process(config=ProcessConfig(test_size=0.1))
+if __name__=="__main__":
+    main()

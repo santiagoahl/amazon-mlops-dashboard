@@ -19,7 +19,6 @@ def get_processed_data(data_location: str):
     """
     return joblib.load(data_location)
 
-
 @task
 def train_model(
     model_params: ModelParams, X_train: pd.DataFrame, y_train: pd.Series
@@ -97,6 +96,44 @@ def train(
     save_model(model, save_path=location.model)
     save_predictions(predictions, save_path=location.data_final)
 
+@task
+def get_X_y(data: pd.DataFrame, label: str):# -> tuple[DataFrame, Series]:
+    """Get features and label
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data to process
+    label : str
+        Name of the label
+    """
+    X = data.drop(columns=label)
+    y = data[label]
+    return X, y
+
+
+@task
+def split_train_test(X: pd.DataFrame, y: pd.DataFrame, test_size: int):
+    """_summary_
+
+    Parameters
+    ----------
+    X : pd.DataFrame
+        Features
+    y : pd.DataFrame
+        Target
+    test_size : int
+        Size of the test set
+    """
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=0
+    )
+    return {
+        "X_train": X_train,
+        "X_test": X_test,
+        "y_train": y_train,
+        "y_test": y_test,
+    }
 
 if __name__ == "__main__":
     train()

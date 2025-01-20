@@ -1,11 +1,14 @@
-"""
-Create an iris flow
-"""
+# This process execute the data ingestion, preprocessing, and inferences
+
 from config import Location, ModelParams, ProcessConfig
 from prefect import flow
-from process import process
-from run_notebook import run_notebook
-from train_model import train
+import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
+
+#from src.deprecated_process import process
+#from src.deprecated_run_notebook import run_notebook
+#from src.train import train
 
 
 @flow
@@ -31,4 +34,5 @@ def iris_flow(
 
 
 if __name__ == "__main__":
-    iris_flow()
+    pass
+    #iris_flow()

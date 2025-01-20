@@ -1,4 +1,4 @@
-# This script executes a HTTP request to the Amazon API (e.g. US products) and saves it
+# This script saves a class built to connect to the Amazon API
 
 import http.client
 import json
@@ -75,18 +75,3 @@ class ApiClient():
         with open(file=output_path, mode="w") as file:
             json.dump(obj=response, fp=file)
         return None
-        
-def main() -> None:   
-    """
-        Pull Data From API.
-    """
-    method="GET"
-    url="/product-category-list?country=US"
-    
-    api_connection = ApiClient()
-    api_connection.http_request(method=method, request_url=url)
-    api_connection.save_response(filename="us_product_list")
-    return None
-
-if __name__=="__main__":
-    main()
