@@ -6,6 +6,7 @@ from prefect import flow, task
 # File Management
 import joblib
 import json
+import os
 
 # Machine Learning Modules
 from sklearn.model_selection import train_test_split
@@ -19,110 +20,13 @@ import numpy as np
 from typing import *
 import re
 
-@task
-def get_raw_data(data_location: str) -> pd.DataFrame:
-    """Read raw data
+PATH_MERGED_RAW_CSVS = "../data/raw/csv/all_countries_tennis_data.csv"
+PATH_API_RESPONSES = "../data/raw/api-calls"
+PATH_CLEANED_DATA = "../data/pre-processed/cleaned/tennis_data_cleaned.csv"
+PATH_PROCESSED_DATA = "../data/pre-processed/cleaned/tennis_data_processed.csv"
 
-    Parameters
-    ----------
-    data_location : str
-        The location of the raw data
-    """
-    return pd.read_csv(data_location)
-
-
-@task 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:   
-    """
-    Cleans and prepares dataframe to make predictions.
-
-    Args:
-        df (pd.DataFrame): Raw data to be cleaned.
-    
-    Returns:
-        pd.DataFrame
-    
-    Example:
-        >>> ('arg1', 'arg2')
-        'output'
-    """
-    
-    # Process price format
-
-    df[['product_price']] = df[[
-        'product_price'
-        ]].map(lambda price_raw: float(price_raw[1:]) if price_raw != None else price_raw)
-
-    df[['product_original_price']] = df[[
-        'product_original_price'
-        ]].map(lambda price_raw: float(price_raw[1:]) if price_raw != None else price_raw)
-
-    df[['product_minimum_offer_price']] = df[[
-        'product_minimum_offer_price'
-        ]].map(lambda price_raw: float(price_raw[1:]) if price_raw != None else price_raw
-    )
-        
-        
-    # Convert to float
-
-    df['product_star_rating'] = df['product_star_rating'].astype(float);
-
-    df["coupon_discount"] = df["coupon_text"].map(
-        lambda coupon_txt: 
-            re.search(pattern="\d{1,2}(\.+\d{1,2})*", string=coupon_txt).group()
-            if type(coupon_txt) != float
-            else '0.0'
-    )
-
-    # conver to float
-
-    df['coupon_discount'] = df['coupon_discount'].map(
-        lambda discount_str: float(discount_str)
-    ) 
-
-    df.drop(labels=["coupon_text"], axis=1);
-
-    # Process categorical data
-
-    df["is_prime"] = pd.get_dummies(
-        df["is_prime"], 
-        dtype=float
-        )[True]
-
-    df["climate_pledge_friendly"] = pd.get_dummies(
-        df["climate_pledge_friendly"], 
-        dtype=float
-        )[True]
-
-    df["has_variations"] = pd.get_dummies(
-        df["has_variations"], 
-        dtype=float
-        )[True]
-
-    # Reorder columns to leave the predict variable at the end
-    
-    input_cols = [
-        'product_price',
-        'product_original_price',
-        'product_star_rating',
-        'product_num_ratings',
-        'product_minimum_offer_price',
-        'is_prime',
-        'climate_pledge_friendly',
-        'has_variations',
-        'coupon_discount'
-    ]
-
-    df = df[
-        input_cols  + ['sales_volume']
-        ]
-    # Imputation of null values
-    df[input_cols] = df[input_cols].fillna(0.0)
-    return df
-
-
-@task
-def extract_json_df(json_file_paths: list) -> pd.DataFrame:   
+##@task
+def extract_json_df() -> pd.DataFrame:   
     """
     Collects a list of json files, extracts the data and merges it.
 
@@ -136,26 +40,105 @@ def extract_json_df(json_file_paths: list) -> pd.DataFrame:
         >>> extract_json_df("../data/api-calls/tenis_products_49.json")
         pd.DataFrame
     """
+    
+    json_file_paths = os.listdir(PATH_API_RESPONSES)
+    json_file_paths = [
+            os.path.join(PATH_API_RESPONSES, f) 
+            for f in json_file_paths
+        ]
     json_files = []
     
     for filepath in json_file_paths:
+        if not filepath.endswith(".json"):
+            continue
         with open(filepath, 'r') as f:
             json_files.append(
                 json.load(f)
             )
         
     dataframes_list = [
-        pd.DataFrame(json.loads(file['response'])['data']['products']) 
+        pd.DataFrame(file['response']) 
         for file in json_files
     ]
     
     data_merged = pd.concat(dataframes_list)
+    data_merged.to_csv(
+        PATH_MERGED_RAW_CSVS,
+        index=False
+    )
     
-    return data_merged
+    return None
 
 
-@task
-def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:   
+#@task
+def clean_data() -> pd.DataFrame:
+    """
+    Cleans and prepares the dataframe to make predictions.
+
+    Returns:
+        pd.DataFrame: Cleaned data ready for prediction.
+    """
+    
+    # TODO: Delete zero records
+    # Load raw data
+    df = pd.read_csv(PATH_MERGED_RAW_CSVS)
+
+    # Helper function to clean price columns
+    def parse_price(price_raw):
+        try:
+            return float(price_raw[1:]) if isinstance(price_raw, str) and price_raw.startswith('$') else 0.0
+        except Exception:
+            return 0.0
+
+    # Clean price columns
+    price_columns = ['product_price', 'product_original_price', 'product_minimum_offer_price']
+    for col in price_columns:
+        df[col] = df[col].apply(parse_price)
+
+    # Convert star rating to float
+    df['product_star_rating'] = pd.to_numeric(df['product_star_rating'], errors='coerce').fillna(0.0)
+
+    # Extract and clean coupon discount
+    df["coupon_discount"] = df["coupon_text"].apply(
+        lambda coupon_txt: float(re.search(r"\d{1,2}(\.\d{1,2})*", coupon_txt).group()) 
+        if isinstance(coupon_txt, str) and re.search(r"\d{1,2}(\.\d{1,2})*", coupon_txt) 
+        else 0.0
+    )
+
+    # Drop unnecessary columns
+    df = df.drop(columns=["coupon_text"], errors="ignore")
+
+    # Process categorical data into numerical (is_prime, climate_pledge_friendly, has_variations)
+    categorical_columns = ["is_prime", "climate_pledge_friendly", "has_variations"]
+    for col in categorical_columns:
+        df[col] = pd.get_dummies(df[col], dtype=float).get(True, 0.0)
+
+    # Reorder columns to leave the target variable at the end
+    input_cols = [
+        'product_price',
+        'product_original_price',
+        'product_star_rating',
+        'product_num_ratings',
+        'product_minimum_offer_price',
+        'is_prime',
+        'climate_pledge_friendly',
+        'has_variations',
+        'coupon_discount'
+    ]
+    df = df[input_cols + ['sales_volume']]
+
+    # Fill missing values
+    df[input_cols] = df[input_cols].fillna(0.0)
+
+    # Save cleaned data
+    df.to_csv(PATH_CLEANED_DATA, index=False)
+
+    return None
+
+
+
+#@task
+def gaussian_noise(target_column) -> pd.DataFrame:   
     """
     Modifies data by adding Gaussian Noise depending on the noise that is desired to be added
 
@@ -175,24 +158,61 @@ def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:
             )
         pd.DataFrame([78, 354])
     """
-    
+        
+    df = pd.read_csv(PATH_CLEANED_DATA)
     # Mean and variance to add Gaussian Noise
     noise_mapping = {
         None: [30, 30 * 0.5],
         'List: ': [30, 30 * 0.5],
         '0': [30, 30 * 0.5],
         'No featured offers available': [30, 30 * 0.5],
+
+        # French stores
+        'Plus de 50 achetés au cours du mois dernier': [50, 50 * 0.5],
+        'Plus de 100 achetés au cours du mois dernier': [50, 50 * 0.5],
+        'Plus de 200 achetés au cours du mois dernier': [200, 200 * 0.5],
+        'Plus de 300 achetés au cours du mois dernier': [300, 300 * 0.5],
+        'Plus de 400 achetés au cours du mois dernier': [400, 400 * 0.5],
+        'Plus de 500 achetés au cours du mois dernier': [500, 500 * 0.5],
+        'Plus de 600 achetés au cours du mois dernier': [600, 600 * 0.5],
+        'Plus de 700 achetés au cours du mois dernier': [700, 700 * 0.5],
+        'Plus de 800 achetés au cours du mois dernier': [800, 800 * 0.5],
+        'Plus de 900 achetés au cours du mois dernier': [900, 900 * 0.5],
+        'Plus de 1 k achetés au cours du mois dernier': [3000, 3000 * 0.5],
+        'Plus de 2 k achetés au cours du mois dernier': [2000, 2000 * 0.5],
+        'Plus de 3 k achetés au cours du mois dernier': [3000, 3000 * 0.5],
+        'Plus de 4 k achetés au cours du mois dernier': [4000, 4000 * 0.5],
+        'Plus de 5 k achetés au cours du mois dernier': [5000, 5000 * 0.5],
+        'Plus de 6 k achetés au cours du mois dernier': [6000, 6000 * 0.5],
+        'Plus de 7 k achetés au cours du mois dernier': [7000, 7000 * 0.5],
+        'Plus de 8 k achetés au cours du mois dernier': [8000, 8000 * 0.5],
+        'Plus de 9 k achetés au cours du mois dernier': [9000, 9000 * 0.5],
+        'Plus de 10 k achetés au cours du mois dernier': [10000, 10000 * 0.5],
+
+        # English stores
         '50+ bought in past month': [50, 50 * 0.5],
-        '100+ bought in past month': [100, 100 * 0.5],
+        '100+ bought in past month': [50, 50 * 0.5],
         '200+ bought in past month': [100, 100 * 0.5],
         '300+ bought in past month': [100, 100 * 0.5],
         '400+ bought in past month': [100, 100 * 0.5],
-        '500+ bought in past month': [200, 200 * 0.5],
+        '500+ bought in past month': [100, 100 * 0.5],
+        '600+ bought in past month': [100, 100 * 0.5],
         '700+ bought in past month': [100, 100 * 0.5],
         '800+ bought in past month': [100, 100 * 0.5],
         '900+ bought in past month': [100, 100 * 0.5],
-        '1K+ bought in past month': [3000, 3000 * 0.5]
-        }
+        '1K+ bought in past month': [3000, 3000 * 0.5],
+        '2K+ bought in past month': [2000, 2000 * 0.5],
+        '3K+ bought in past month': [3000, 3000 * 0.5],
+        '4K+ bought in past month': [4000, 4000 * 0.5],
+        '5K+ bought in past month': [5000, 5000 * 0.5],
+        '6K+ bought in past month': [6000, 6000 * 0.5],
+        '7K+ bought in past month': [7000, 7000 * 0.5],
+        '8K+ bought in past month': [8000, 8000 * 0.5],
+        '9K+ bought in past month': [9000, 9000 * 0.5],
+        '10K+ bought in past month': [10000, 10000 * 0.5],
+        '15K+ bought in past month': [15000, 15000 * 0.5]
+    }
+
     
     # Define column names, these columns will help to add the Gaussian Noise
     target_column_numerical = target_column + "_numerical"
@@ -203,7 +223,7 @@ def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:
     # Clean output variable -> Non-info values are supposed to be replaced by 0
 
     df[target_column_cleaned] = df[target_column].map(
-        lambda value: value if re.match(pattern='\d+', string=str(value))
+        lambda value: value if re.match(pattern='\d', string=str(value))
         else '0'
     )
     
@@ -211,7 +231,7 @@ def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:
     
     # Get the numerical values from the target_column 
     target_column_vals = {
-        val_raw: re.search(pattern='\d+', string=val_raw).group() 
+        val_raw: re.search(pattern='\d', string=val_raw).group() 
         for val_raw in target_column_vals_raw
     }
     
@@ -238,17 +258,22 @@ def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:
     # Redefine the target column adding Gaussian Noise
     df[target_column] = df[target_column_numerical] + df[gaussian_noise_column]
     
-    df[[target_column]] = df[[target_column]].map(lambda x: int(x))
+    df[target_column] = df[target_column].map(lambda x: int(x))
     
     df.drop(
         [target_column_numerical, gaussian_noise_column, target_column_cleaned],
         axis=1,
         inplace=True
     )
-    return df
+    
+    df.to_csv(
+        PATH_PROCESSED_DATA,
+        index=False    
+    )
+    return None
 
 
-@task
+#@task
 def drop_columns(data: pd.DataFrame, columns: list) -> pd.DataFrame:
     """Drop unimportant columns
 
@@ -262,7 +287,7 @@ def drop_columns(data: pd.DataFrame, columns: list) -> pd.DataFrame:
     return data.drop(columns=columns)
 
 
-@task
+#@task
 def augment_data(df: pd.DataFrame, scale: float = 1.0) -> pd.DataFrame:   
     """
     Creates synthetic samples using KDE.
@@ -280,11 +305,11 @@ def augment_data(df: pd.DataFrame, scale: float = 1.0) -> pd.DataFrame:
         >>> 
     """
     
-    
+    pass
     return aug_df
 
 
-@task
+#@task
 def save_processed_data(data: dict, save_location: str) -> None:
     """Save processed data
 
@@ -298,7 +323,7 @@ def save_processed_data(data: dict, save_location: str) -> None:
     joblib.dump(data, save_location)
     
 
-@task
+#@task
 def main() -> None:   
     """
     Description.
