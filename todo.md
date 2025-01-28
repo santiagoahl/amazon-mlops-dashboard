@@ -34,9 +34,10 @@
 # Milestone 3: Automation
 
 * [X] Automate Data Ingestion
-* [ ] Automate Data Preprocessing
+* [X] Automate Data Preprocessing
   * [X] Cleaning + Gaussian Noise
-  * [ ] Data Augmentation
-* [ ] Automate ML Modeling
-  * [ ] Train
+  * [X] Data Augmentation
+  * [ ] Include files with categorical info (A possible solution is to filter numerical columns in each script)
+* [X] Automate ML Modeling
+  * [X] Train
   * [ ] Inferences

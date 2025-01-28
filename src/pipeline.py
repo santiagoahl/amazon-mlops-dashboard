@@ -3,6 +3,10 @@
 from config import Location, ModelParams, ProcessConfig
 from prefect import flow
 import warnings
+import logging
+import os
+import sys
+import data_ingestion, data_preprocessing, train, predict
 
 warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 
@@ -10,13 +14,24 @@ warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 #from src.deprecated_run_notebook import run_notebook
 #from src.train import train
 
+# Set Logger
+logging.basicConfig(
+    format="%(asctime)s %(levelname)s:%(name)s: %(message)s",
+    level=logging.INFO,
+    datefmt="%Y:%m:%d %H:%M:%S",
+    stream=sys.stderr,
+    filename=os.path.join(Location().root_dir, "data/logs/train/output.log")
+)
 
-@flow
-def iris_flow(
+logger = logging.getLogger(name="Logger")
+logger.setLevel(logging.INFO)
+
+#flow
+def tennis_demmand_flow(
     location: Location = Location(),
     process_config: ProcessConfig = ProcessConfig(),
     model_params: ModelParams = ModelParams(),
-):
+) -> None:
     """Flow to run the process, train, and run_notebook flows
 
     Parameters
@@ -28,11 +43,15 @@ def iris_flow(
     model_params : ModelParams, optional
         Configurations for training models, by default ModelParams()
     """
-    process(location, process_config)
-    train(location, model_params)
-    run_notebook(location)
+    #data_ingestion()
+    
+    logger.info("Running Script: data_preprocessing.py...")
+    data_preprocessing.main()
+    logger.info("Running Script: train.py...")
+    train.main()
+    logger.info("Running Script: predict.py...")
+    predict.main()
 
 
 if __name__ == "__main__":
-    pass
-    #iris_flow()
+    tennis_demmand_flow()

@@ -1,10 +1,23 @@
 # This script executes a HTTP request to the Amazon API (e.g. US products) and saves it
 
 from api_client import *
+from config import Location
 from typing import Union
 import json
+import logging
+import sys
 
-QUERIES_PATH = "../api_queries.json"
+# Set Logger
+logging.basicConfig(
+    format="%(asctime)s %(levelname)s:%(name)s: %(message)s",
+    level=logging.INFO,
+    datefmt="%Y:%m:%d %H:%M:%S",
+    stream=sys.stderr,
+    filename=os.path.join(Location().root_dir, "data/logs/train/output.log")
+)
+
+logger = logging.getLogger(name="Logger")
+logger.setLevel(logging.INFO)
 
 def run_http_request(query: dict) -> None:   
     """
@@ -14,7 +27,9 @@ def run_http_request(query: dict) -> None:
     method = "GET"
     #url = "/search?query=Tenis&country=US" # TODO: Update the query, add other countries
     
+    logging.info("Establishing Connection to API...")
     api_connection = ApiClient()
+    
     for url in query["endpoints"]:
         api_connection.http_request(
                 method=method, 
@@ -23,19 +38,24 @@ def run_http_request(query: dict) -> None:
             )
     
     api_connection.save_response(filename=query["filename"]) 
+    
     return None
 
-def main() -> None:
-    
+def data_ingestion(location: Location = Location()):
     # Get the HTTP reponses to indicate what the API to bring us
-    with open(QUERIES_PATH, "r") as f:
+    logging.info("Loading Queries...")
+    with open(location.api_queries, "r") as f:
         queries = json.load(f)
-        
+    
+    logging.info("Running HTTP Requests...")
     # Run # HTTP responses
     for query in queries:
         run_http_request(query)
         
-    return None
+    logging.info("HTTP Requests Successfully completed. Saved in {filename}".format(query["filename"]))
+
+def main() -> None:    
+    data_ingestion()
 
 if __name__=="__main__":
     main()

@@ -1,5 +1,6 @@
 # This script cleans, transforms and adds gaussian noise for oversampling purposes
 
+import logging.config
 from config import Location, ProcessConfig
 from prefect import flow, task
 
@@ -7,6 +8,7 @@ from prefect import flow, task
 import joblib
 import json
 import os
+import sys
 
 # Machine Learning Modules
 from sklearn.model_selection import train_test_split
@@ -19,18 +21,26 @@ import numpy as np
 
 from typing import *
 import re
+import logging
 
-PATH_MERGED_RAW_CSVS = "../data/raw/csv/all_countries_tennis_data.csv"
-PATH_API_RESPONSES = "../data/raw/api-calls"
-PATH_CLEANED_DATA = "../data/pre-processed/cleaned/tennis_data_cleaned.csv"
-PATH_PROCESSED_DATA = "../data/pre-processed/cleaned/tennis_data_processed.csv"
+# Logging config
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s:%(name)s: %(message)s",
+    datefmt="%Y:%m:%d %H:%M:%S",
+    stream=sys.stderr,
+    filename=os.path.join(Location().root_dir, "data/logs/preprocess/output.log")
+)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 ##@task
-def extract_json_df() -> pd.DataFrame:   
+def extract_json_df(location: Location = Location()) -> pd.DataFrame:   
     """
     Collects a list of json files, extracts the data and merges it.
 
-    Args:
+    Parameters:
+    ----------
         json_file_paths (list): Files to examinate.
     
     Returns:
@@ -41,9 +51,11 @@ def extract_json_df() -> pd.DataFrame:
         pd.DataFrame
     """
     
-    json_file_paths = os.listdir(PATH_API_RESPONSES)
+    df = pd.read_csv(location.data_raw)
+
+    json_file_paths = os.listdir(location.path_api_responses)
     json_file_paths = [
-            os.path.join(PATH_API_RESPONSES, f) 
+            os.path.join(location.path_api_responses, f) 
             for f in json_file_paths
         ]
     json_files = []
@@ -63,15 +75,15 @@ def extract_json_df() -> pd.DataFrame:
     
     data_merged = pd.concat(dataframes_list)
     data_merged.to_csv(
-        PATH_MERGED_RAW_CSVS,
+        location.data_raw,
         index=False
     )
     
-    return None
+    return df
 
 
 #@task
-def clean_data() -> pd.DataFrame:
+def clean_data(df: pd.DataFrame = None, location: Location = Location()) -> pd.DataFrame:
     """
     Cleans and prepares the dataframe to make predictions.
 
@@ -81,10 +93,18 @@ def clean_data() -> pd.DataFrame:
     
     # TODO: Delete zero records
     # Load raw data
-    df = pd.read_csv(PATH_MERGED_RAW_CSVS)
+    # Read CSV in case user have passed no df to
+    if df is None:
+        try:
+            df = pd.read_csv(location.data_raw)
+            logger.info(f"DataFrame loaded from: {location.data_raw}")
+        except FileNotFoundError:
+            raise ValueError(f"File not found at the specified location: {location.data_raw}")
+        except Exception as e:
+            raise ValueError(f"An error occurred while reading the file: {e}")
 
     # Helper function to clean price columns
-    def parse_price(price_raw):
+    def parse_price(price_raw) -> float:
         try:
             return float(price_raw[1:]) if isinstance(price_raw, str) and price_raw.startswith('$') else 0.0
         except Exception:
@@ -131,18 +151,18 @@ def clean_data() -> pd.DataFrame:
     df[input_cols] = df[input_cols].fillna(0.0)
 
     # Save cleaned data
-    df.to_csv(PATH_CLEANED_DATA, index=False)
+    df.to_csv(location.data_clean, index=False)
 
-    return None
-
+    return df
 
 
 #@task
-def gaussian_noise(target_column) -> pd.DataFrame:   
+def gaussian_noise(target_column, location: Location = Location()) -> pd.DataFrame:   
     """
     Modifies data by adding Gaussian Noise depending on the noise that is desired to be added
 
-    Args:
+    Parameters:
+    ----------
         df (pd.Series|pd.DataFrame): Data to be transformed.
         targe_column (str): Column to be transformed with Gaussian Noise
     
@@ -159,7 +179,7 @@ def gaussian_noise(target_column) -> pd.DataFrame:
         pd.DataFrame([78, 354])
     """
         
-    df = pd.read_csv(PATH_CLEANED_DATA)
+    df = pd.read_csv(location.data_clean)
     # Mean and variance to add Gaussian Noise
     noise_mapping = {
         None: [30, 30 * 0.5],
@@ -267,7 +287,7 @@ def gaussian_noise(target_column) -> pd.DataFrame:
     )
     
     df.to_csv(
-        PATH_PROCESSED_DATA,
+        location.data_process,
         index=False    
     )
     return None
@@ -287,14 +307,56 @@ def drop_columns(data: pd.DataFrame, columns: list) -> pd.DataFrame:
     return data.drop(columns=columns)
 
 
+def knn_linear(
+            df_original: pd.DataFrame,
+            df_augmented: pd.DataFrame,
+            k: int=10
+        ) -> None:
+    """
+    Estimate y using similar (x, y) samples using KNN
+    
+    Parameters:
+    ----------
+        df_original (pd.DataFrame): DataFrame without sythetic samples.
+        df_augmented (pd.DataFrame): DataFrame with sythetic samples. 
+        k (int): Main parameter to run KNN.
+        
+    Returns:
+        pd.DataFrame: Augmented data with estimated y values.
+    """
+    
+    X = df_original.drop("sales_volume", axis=1).to_numpy()
+    y = df_original["sales_volume"].to_numpy()
+    
+    y_hat_array = []
+    for x in df_augmented.values:
+        
+        # Calculate the K Nearest Neighbors
+        euclidean_distances = np.linalg.norm(X-x, axis=1)
+        sorted_indices = np.argsort(euclidean_distances, axis=0)[:k]
+        
+        # Get the y values of the associated KNN
+        y_knn = y[sorted_indices]
+        
+        # Compute estimation of y as y_hat
+        y_hat = y_knn.mean()
+        y_hat_array.append(int(y_hat))
+
+    y_hat_array = np.array([y_hat_array]).reshape(len(df_augmented),)
+    
+    # Include y_hat as df column
+    df_augmented["sales_volume"] = y_hat_array
+    return df_augmented
+
 #@task
-def augment_data(df: pd.DataFrame, scale: float = 1.0) -> pd.DataFrame:   
+def augment_data(aug_factor: float = 10.0, location: Location = Location()) -> pd.DataFrame:   
     """
     Creates synthetic samples using KDE.
 
-    Args:
+    Parameters:
+    ----------
         df (pd.DataFrame): DataFrame to increase samples.
-        scale (float): Augmentation multiplier, default 1.0. Use float numbers
+        aug_factor (float): Augmentation multiplier, default 1.0. Use float numbers
             greater or equal than 1.0 to augment the number of samples, 2.0 to 
             duplicate and so on.
     
@@ -305,8 +367,41 @@ def augment_data(df: pd.DataFrame, scale: float = 1.0) -> pd.DataFrame:
         >>> 
     """
     
-    pass
-    return aug_df
+    distributions = joblib.load(location.distributions) 
+    df = pd.read_csv(location.data_process)
+    
+    input_samples = []
+    n_samples = int(len(df) * aug_factor)
+
+    # Generate syntetic samples using estimated PDFs
+    for distribution_obj in distributions:
+        #logger.info(distribution_obj["random_variable"])
+        pdf = distribution_obj["scipy_pdf_obj"]
+
+        if distribution_obj["kind"] == "parametric":
+            # Generate synthetic samples using rvs() for parametric distributions
+            syntetic_samples = pdf.rvs(size=n_samples).reshape(n_samples,)
+        elif distribution_obj["kind"] == "non-parametric":
+            # Generate synthetic samples using resample() for non-parametric distributions
+            syntetic_samples = pdf.resample(size=n_samples).reshape(n_samples,)
+
+        # Append the generated samples to the input_samples list
+        input_samples.append(syntetic_samples)
+
+    # Stack all generated samples into a single numpy array
+    input_samples = np.column_stack(input_samples)
+    
+    df_augmented = pd.DataFrame(
+            data=input_samples, 
+            columns=df.columns.drop("sales_volume")
+        )
+    
+    # Fill estimated y samples
+    df_augmented = knn_linear(df, df_augmented)
+    
+    # Generate output samples
+    df_augmented.to_csv(location.data_augmented, index=False)
+    return None
 
 
 #@task
@@ -324,23 +419,26 @@ def save_processed_data(data: dict, save_location: str) -> None:
     
 
 #@task
-def main() -> None:   
+def process_data(location: Location = Location()) -> None:   
     """
     Description.
-
-    Args:
-        arg1 (type): .
-        arg2 (type): .
-        arg3 (type): .
     
-    Returns:
-        type:
-    
-    Example:
-        >>> ('arg1', 'arg2')
-        'output'
     """
-    pass
+    logger.info("Extracting Raw Data...")
+    extract_json_df()
+    logger.info("Cleaning Data...")
+    clean_data()
+    logger.info("Formatting output var and including Gaussian Noise...")
+    gaussian_noise("sales_volume")
+    logger.info("Augmenting Data...")
+    
+    # TODO: Include a distribution estimation module
+    augment_data()
+    logger.info(f"Data Succesfully Processed \nData Saved in {location.data_augmented}")
+    return None
+
+def main() -> None:
+    process_data()
 
 if __name__=="__main__":
     main()
