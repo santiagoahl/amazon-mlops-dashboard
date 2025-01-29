@@ -7,13 +7,16 @@ import json
 import logging
 import sys
 
+    
 # Set Logger
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+    
 logging.basicConfig(
     format="%(asctime)s %(levelname)s:%(name)s: %(message)s",
     level=logging.INFO,
     datefmt="%Y:%m:%d %H:%M:%S",
-    stream=sys.stderr,
-    filename=os.path.join(Location().root_dir, "data/logs/train/output.log")
+    filename=os.path.join(Location().root_dir, "data/logs/ingestion/output.log")
 )
 
 logger = logging.getLogger(name="Logger")
@@ -54,8 +57,5 @@ def data_ingestion(location: Location = Location()):
         
     logging.info("HTTP Requests Successfully completed. Saved in {filename}".format(query["filename"]))
 
-def main() -> None:    
-    data_ingestion()
-
 if __name__=="__main__":
-    main()
+    data_ingestion()

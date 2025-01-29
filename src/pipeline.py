@@ -6,7 +6,10 @@ import warnings
 import logging
 import os
 import sys
-import data_ingestion, data_preprocessing, train, predict
+from data_ingestion import *
+from data_preprocessing import *
+from train import *
+from predict import *
 
 warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 
@@ -28,10 +31,10 @@ logger.setLevel(logging.INFO)
 
 #flow
 def tennis_demmand_flow(
-    location: Location = Location(),
-    process_config: ProcessConfig = ProcessConfig(),
-    model_params: ModelParams = ModelParams(),
-) -> None:
+        location: Location = Location(),
+        process_config: ProcessConfig = ProcessConfig(),
+        model_params: ModelParams = ModelParams(),
+    ) -> None:
     """Flow to run the process, train, and run_notebook flows
 
     Parameters
@@ -43,14 +46,14 @@ def tennis_demmand_flow(
     model_params : ModelParams, optional
         Configurations for training models, by default ModelParams()
     """
-    #data_ingestion()
     
+    #data_ingestion()
     logger.info("Running Script: data_preprocessing.py...")
-    data_preprocessing.main()
+    data_preprocessing()
     logger.info("Running Script: train.py...")
-    train.main()
+    train()
     logger.info("Running Script: predict.py...")
-    predict.main()
+    predict()
 
 
 if __name__ == "__main__":

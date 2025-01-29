@@ -33,11 +33,13 @@ mlflow_client = mlflow.MlflowClient(tracking_uri=Location().mlflow_tracking_uri)
 os.environ["LOGNAME"] = DEV_NAME
 
 # Set Logger
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+    
 logging.basicConfig(
     format="%(asctime)s %(levelname)s:%(name)s: %(message)s",
     level=logging.INFO,
     datefmt="%Y:%m:%d %H:%M:%S",
-    stream=sys.stderr,
     filename=os.path.join(Location().root_dir, "data/logs/train/output.log")
 )
 
@@ -209,7 +211,7 @@ def train(
         Model Hyperparameter grid for training the model, by default ModelParams()
     """
     logger.info("Importing Train Data...")
-    data = get_processed_data(location.data_process)
+    data = get_processed_data(location.data_augmented)
     logger.info("Training Models...")
     model = train_model(model_params, data["X_train"], data["y_train"])
     logger.info("Saving Models...")
@@ -227,7 +229,7 @@ def train(
         experiment_name=f"Train Models Script - MLflow Integration"
     )
     #f"SVR - Augmented Dataset ({TIMESTAMP})"
-    with mlflow.start_run(run_name=f"SVR - Original Dataset ({TIMESTAMP})") as mf:
+    with mlflow.start_run(run_name=f"SVR - Augmented Dataset ({TIMESTAMP})") as mf:
         mlflow.set_tag("developer", DEV_NAME)
         mlflow.set_tag("dataset", "v1.0")
         mlflow.set_tag("runtype", "model training")
@@ -246,8 +248,5 @@ def train(
     logger.info(f"Model Succesfully trained\nModel Saved in {location.model}")
     return metrics
 
-def main() -> None:
-    train()
-
 if __name__ == "__main__":
-    main()
+    train()

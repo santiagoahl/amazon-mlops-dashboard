@@ -36,12 +36,14 @@ mlflow_client = mlflow.MlflowClient(tracking_uri=Location().mlflow_tracking_uri)
 os.environ["LOGNAME"] = DEV_NAME
 
 # Set Logger
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+    
 logging.basicConfig(
     format="%(asctime)s %(levelname)s:%(name)s: %(message)s",
     level=logging.INFO,
     datefmt="%Y:%m:%d %H:%M:%S",
-    stream=sys.stderr,
-    filename=os.path.join(Location().root_dir, "data/logs/train/output.log")
+    filename=os.path.join(Location().root_dir, "data/logs/inference/output.log")
 )
 
 logger = logging.getLogger(name="Logger")
@@ -97,7 +99,7 @@ def prepare_data(df: pd.DataFrame = None, location: Location = Location()) -> pd
 
 
 ##@task
-def predict(input_df: Union[pd.DataFrame, np.array], location: Location = Location()) -> Any:   
+def compute_inferences(input_df: Union[pd.DataFrame, np.array], location: Location = Location()) -> Any:   
     """
     Description.
 
@@ -123,7 +125,7 @@ def predict(input_df: Union[pd.DataFrame, np.array], location: Location = Locati
         model = joblib.load(m)
     
     input_df.drop("sales_volume", axis=1, inplace=True)
-    # Compute predictions
+    # Compute compute_inferences
     predictions = model.predict(input_df)
     return predictions
 
@@ -163,7 +165,7 @@ def include_predictions(
 
 
 #@flow
-def compute_inferences(location: Location = Location()) -> None:   
+def predict(location: Location = Location()) -> None:   
     """
     Description.
 
@@ -188,37 +190,12 @@ def compute_inferences(location: Location = Location()) -> None:
     logger.info("Preparing Data for Inferences...")
     input_df = prepare_data(df=df_raw)
     logger.info("Computing Inferences...")
-    predictions = predict(input_df=input_df)
-    logger.info("Saving Predictions...")
+    predictions = compute_inferences(input_df=input_df)
+    logger.info("Saving compute_inferences...")
     include_predictions(input_df=df_raw, predictions=predictions)
-    logger.info(f"Inferences Succesfully Computed. \nPredictions Saved in {location.data_final}")
+    logger.info(f"Inferences Succesfully Computed. \ncompute_inferences Saved in {location.data_final}")
     return None
 
-
-
-def main(location: Location = Location()) -> None:   
-    """
-    Description.
-
-    Parameters
-    ----------
-    arg1 : type
-        Description
-    arg2 : type
-        Description
-    arg3 : type
-        Description
-
-    Returns:
-        type:
-    
-    Example:
-        >>> ('arg1', 'arg2')
-        'output'
-    """
-    
-    compute_inferences()
-    return None
 
 if __name__=="__main__":
-    main()
+    predict()

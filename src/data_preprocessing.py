@@ -24,11 +24,13 @@ import re
 import logging
 
 # Logging config
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s:%(name)s: %(message)s",
     datefmt="%Y:%m:%d %H:%M:%S",
-    stream=sys.stderr,
     filename=os.path.join(Location().root_dir, "data/logs/preprocess/output.log")
 )
 logger = logging.getLogger()
@@ -182,55 +184,55 @@ def gaussian_noise(target_column, location: Location = Location()) -> pd.DataFra
     df = pd.read_csv(location.data_clean)
     # Mean and variance to add Gaussian Noise
     noise_mapping = {
-        None: [30, 30 * 0.5],
-        'List: ': [30, 30 * 0.5],
-        '0': [30, 30 * 0.5],
-        'No featured offers available': [30, 30 * 0.5],
+        None: [25.0, 15.0],
+        'List: ': [25.0, 15.0],
+        '0': [25.0, 15.0],
+        'No featured offers available': [25.0, 15.0],
 
         # French stores
-        'Plus de 50 achetés au cours du mois dernier': [50, 50 * 0.5],
-        'Plus de 100 achetés au cours du mois dernier': [50, 50 * 0.5],
-        'Plus de 200 achetés au cours du mois dernier': [200, 200 * 0.5],
-        'Plus de 300 achetés au cours du mois dernier': [300, 300 * 0.5],
-        'Plus de 400 achetés au cours du mois dernier': [400, 400 * 0.5],
-        'Plus de 500 achetés au cours du mois dernier': [500, 500 * 0.5],
-        'Plus de 600 achetés au cours du mois dernier': [600, 600 * 0.5],
-        'Plus de 700 achetés au cours du mois dernier': [700, 700 * 0.5],
-        'Plus de 800 achetés au cours du mois dernier': [800, 800 * 0.5],
-        'Plus de 900 achetés au cours du mois dernier': [900, 900 * 0.5],
-        'Plus de 1 k achetés au cours du mois dernier': [3000, 3000 * 0.5],
-        'Plus de 2 k achetés au cours du mois dernier': [2000, 2000 * 0.5],
-        'Plus de 3 k achetés au cours du mois dernier': [3000, 3000 * 0.5],
-        'Plus de 4 k achetés au cours du mois dernier': [4000, 4000 * 0.5],
-        'Plus de 5 k achetés au cours du mois dernier': [5000, 5000 * 0.5],
-        'Plus de 6 k achetés au cours du mois dernier': [6000, 6000 * 0.5],
-        'Plus de 7 k achetés au cours du mois dernier': [7000, 7000 * 0.5],
-        'Plus de 8 k achetés au cours du mois dernier': [8000, 8000 * 0.5],
-        'Plus de 9 k achetés au cours du mois dernier': [9000, 9000 * 0.5],
-        'Plus de 10 k achetés au cours du mois dernier': [10000, 10000 * 0.5],
+        'Plus de 50 achetés au cours du mois dernier': [75.0, 25.0],
+        'Plus de 100 achetés au cours du mois dernier': [150.0, 50.0],
+        'Plus de 200 achetés au cours du mois dernier': [250.0, 50.0],
+        'Plus de 300 achetés au cours du mois dernier': [350.0, 50.0],
+        'Plus de 400 achetés au cours du mois dernier': [450.0, 50.0],
+        'Plus de 500 achetés au cours du mois dernier': [550.0, 50.0],
+        'Plus de 600 achetés au cours du mois dernier': [650.0, 50.0],
+        'Plus de 700 achetés au cours du mois dernier': [750.0, 50.0],
+        'Plus de 800 achetés au cours du mois dernier': [850.0, 50.0],
+        'Plus de 900 achetés au cours du mois dernier': [950.0, 50.0],
+        'Plus de 1 k achetés au cours du mois dernier': [1500.0, 500.0],
+        'Plus de 2 k achetés au cours du mois dernier': [2500.0, 500.0],
+        'Plus de 3 k achetés au cours du mois dernier': [3500.0, 500.0],
+        'Plus de 4 k achetés au cours du mois dernier': [4500.0, 500.0],
+        'Plus de 5 k achetés au cours du mois dernier': [5500.0, 500.0],
+        'Plus de 6 k achetés au cours du mois dernier': [6500.0, 500.0],
+        'Plus de 7 k achetés au cours du mois dernier': [7500.0, 500.0],
+        'Plus de 8 k achetés au cours du mois dernier': [8500.0, 500.0],
+        'Plus de 9 k achetés au cours du mois dernier': [9500.0, 500.0],
+        'Plus de 10 k achetés au cours du mois dernier':[12500.0, 2500.0],
 
         # English stores
-        '50+ bought in past month': [50, 50 * 0.5],
-        '100+ bought in past month': [50, 50 * 0.5],
-        '200+ bought in past month': [100, 100 * 0.5],
-        '300+ bought in past month': [100, 100 * 0.5],
-        '400+ bought in past month': [100, 100 * 0.5],
-        '500+ bought in past month': [100, 100 * 0.5],
-        '600+ bought in past month': [100, 100 * 0.5],
-        '700+ bought in past month': [100, 100 * 0.5],
-        '800+ bought in past month': [100, 100 * 0.5],
-        '900+ bought in past month': [100, 100 * 0.5],
-        '1K+ bought in past month': [3000, 3000 * 0.5],
-        '2K+ bought in past month': [2000, 2000 * 0.5],
-        '3K+ bought in past month': [3000, 3000 * 0.5],
-        '4K+ bought in past month': [4000, 4000 * 0.5],
-        '5K+ bought in past month': [5000, 5000 * 0.5],
-        '6K+ bought in past month': [6000, 6000 * 0.5],
-        '7K+ bought in past month': [7000, 7000 * 0.5],
-        '8K+ bought in past month': [8000, 8000 * 0.5],
-        '9K+ bought in past month': [9000, 9000 * 0.5],
-        '10K+ bought in past month': [10000, 10000 * 0.5],
-        '15K+ bought in past month': [15000, 15000 * 0.5]
+        '50+ bought in past month': [75.0, 25.0],
+        '100+ bought in past month': [150.0, 50.0],
+        '200+ bought in past month': [250.0, 50.0],
+        '300+ bought in past month': [350.0, 50.0],
+        '400+ bought in past month': [450.0, 50.0],
+        '500+ bought in past month': [550.0, 50.0],
+        '600+ bought in past month': [650.0, 50.0],
+        '700+ bought in past month': [750.0, 50.0],
+        '800+ bought in past month': [850.0, 50.0],
+        '900+ bought in past month': [950.0, 50.0],
+        '1K+ bought in past month': [1500.0, 500.0],
+        '2K+ bought in past month': [2500.0, 500.0],
+        '3K+ bought in past month': [3500.0, 500.0],
+        '4K+ bought in past month': [4500.0, 500.0],
+        '5K+ bought in past month': [5500.0, 500.0],
+        '6K+ bought in past month': [6500.0, 500.0],
+        '7K+ bought in past month': [7500.0, 500.0],
+        '8K+ bought in past month': [8500.0, 500.0],
+        '9K+ bought in past month': [9500.0, 500.0],
+        '10K+ bought in past month': [12500.0, 2500.0],
+        '15K+ bought in past month': [17500.0, 2500.0]
     }
 
     
@@ -349,14 +351,14 @@ def knn_linear(
     return df_augmented
 
 #@task
-def augment_data(aug_factor: float = 10.0, location: Location = Location()) -> pd.DataFrame:   
+def augment_data(aug_factor: float = 20.0, location: Location = Location()) -> pd.DataFrame:   
     """
     Creates synthetic samples using KDE.
 
     Parameters:
     ----------
         df (pd.DataFrame): DataFrame to increase samples.
-        aug_factor (float): Augmentation multiplier, default 1.0. Use float numbers
+        aug_factor (float): Augmentation multiplier, default 10.0. Use float numbers
             greater or equal than 1.0 to augment the number of samples, 2.0 to 
             duplicate and so on.
     
@@ -419,7 +421,7 @@ def save_processed_data(data: dict, save_location: str) -> None:
     
 
 #@task
-def process_data(location: Location = Location()) -> None:   
+def data_preprocessing(location: Location = Location()) -> None:   
     """
     Description.
     
@@ -437,8 +439,5 @@ def process_data(location: Location = Location()) -> None:
     logger.info(f"Data Succesfully Processed \nData Saved in {location.data_augmented}")
     return None
 
-def main() -> None:
-    process_data()
-
 if __name__=="__main__":
-    main()
+    data_preprocessing()
