@@ -1,27 +1,31 @@
 # TODO
 
+# @bugfixing
+
+* [ ] Logger is not working
+
 ## Milestone 1: Get data
 
 * [X] Get a scope of which data can be tracked
 
   * [X] Try out with 10 different api requests
   * [X] Save the outputs in `data/raw/`
-* [ ] KDE data augmentation
+* [X] KDE data augmentation
 
   * [ ] Create an script for data augmentation -> take care of variables distribution
-  * [ ] Test the script into a notebook and save the data (I would like to have ~50k datapoints)
-  * [ ] Make a simple sketch of how a data transformation pipeline would work, let's try out with figma
-* [ ] Mount data in Databricks
+  * [X] Test the script into a notebook and save the data (I would like to have ~50k datapoints)
+  * [X] Make a simple sketch of how a data transformation pipeline would work, let's try out with figma
+* [X] Mount data in Databricks
 
-  * [ ] Mount data
-  * [ ] Try to manage using spark
-  * [ ] Connect MLFLOW
-* [ ] Experiment with MLFLOW
+  * [X] Mount data
+  * [X] Try to manage using spark
+  * [X] Connect MLFLOW
+* [X] Experiment with MLFLOW
 
-  * [ ] Focus on linear models and feature engineering
-  * [ ] Try to achieve good r2 and rmse metrics
-  * [ ] Visualize model performance results using cool plots
-  * [ ] How to reproduce experiments?
+  * [X] Focus on linear models and feature engineering
+  * [X] Try to achieve good r2 and rmse metrics
+  * [X] Visualize model performance results using cool plots
+  * [X] How to reproduce experiments?
 * [ ] Learn DataBricks
 
   * [ ] Interact with databricks
@@ -30,3 +34,18 @@
 # Milestone 2: MLFlow Experimentation
 
 * [ ] Try out with XGB, LGBM
+
+# Milestone 3: Automation
+
+* [X] Automate Data Ingestion
+* [X] Automate Data Preprocessing
+  * [X] Cleaning + Gaussian Noise
+  * [X] Data Augmentation
+  * [X] Include files with categorical info (A possible solution is to filter numerical columns in each script)
+* [X] Automate ML Modeling
+  * [X] Train
+  * [X] Inferences
+
+# Milestone 4: Streamlit
+
+* [ ] Learn Streamlit

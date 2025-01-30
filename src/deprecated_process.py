@@ -19,7 +19,7 @@ import numpy as np
 from typing import *
 import re
 
-@task
+@task #Delete
 def get_raw_data(data_location: str) -> pd.DataFrame:
     """Read raw data
 
@@ -69,7 +69,7 @@ def evaluate_regression_model(
     
     return performance_metrics
 
-@task
+@task # Delete
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:   
     """
     Cleans and prepares dataframe to make predictions.
@@ -158,7 +158,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df[input_cols] = df[input_cols].fillna(0.0)
     return df
 
-@task
+@task  # Delete
 def extract_json_df(json_file_paths: list) -> pd.DataFrame:   
     """
     Collects a list of json files, extracts the data and merges it.
@@ -190,7 +190,7 @@ def extract_json_df(json_file_paths: list) -> pd.DataFrame:
     
     return data_merged
 
-@task
+@task  # Delete
 def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:   
     """
     Modifies data by adding Gaussian Noise depending on the noise that is desired to be added
@@ -283,7 +283,7 @@ def gaussian_noise(df: pd.DataFrame, target_column: str) -> pd.DataFrame:
     )
     return df
 
-@task
+@task  # Delete
 def drop_columns(data: pd.DataFrame, columns: list) -> pd.DataFrame:
     """Drop unimportant columns
 
@@ -297,7 +297,7 @@ def drop_columns(data: pd.DataFrame, columns: list) -> pd.DataFrame:
     return data.drop(columns=columns)
 
 
-@task
+@task  # Delete
 def get_X_y(data: pd.DataFrame, label: str):# -> tuple[DataFrame, Series]:
     """Get features and label
 
@@ -313,7 +313,7 @@ def get_X_y(data: pd.DataFrame, label: str):# -> tuple[DataFrame, Series]:
     return X, y
 
 
-@task
+@task  # Delete
 def split_train_test(X: pd.DataFrame, y: pd.DataFrame, test_size: int):
     """_summary_
 
@@ -336,7 +336,7 @@ def split_train_test(X: pd.DataFrame, y: pd.DataFrame, test_size: int):
         "y_test": y_test,
     }
     
-@task
+@task  # Delete
 def augment_data(df: pd.DataFrame, scale: float = 1.0) -> pd.DataFrame:   
     """
     Creates synthetic samples using KDE.
@@ -358,8 +358,8 @@ def augment_data(df: pd.DataFrame, scale: float = 1.0) -> pd.DataFrame:
     return aug_df
 
 
-@task
-def save_processed_data(data: dict, save_location: str):
+@task  # Delete
+def save_processed_data(data: dict, save_location: str) -> None:
     """Save processed data
 
     Parameters

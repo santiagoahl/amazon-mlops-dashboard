@@ -1,0 +1,227 @@
+[
+    {
+        "description": "Tennis Products - United States",
+        "country_name": "United States",
+        "country_code": "US",
+        "endpoints": [
+            "/search?query=tennis&country=US&page=1",
+            "/search?query=tennis&country=US&page=2",
+            "/search?query=tennis&country=US&page=3",
+            "/search?query=tennis&country=US&page=4",
+            "/search?query=tennis&country=US&page=5",
+            "/search?query=tennis&country=US&page=6",
+            "/search?query=tennis&country=US&page=7"
+
+            ],
+        "filename": "tennis_products_us"
+    },
+    {
+        "description": "Tennis Products - Australia",
+        "country_name": "Australia",
+        "country_code": "AU",
+        "endpoints": [
+            "/search?query=tennis&country=AU&page=1",
+            "/search?query=tennis&country=AU&page=2",
+            "/search?query=tennis&country=AU&page=3",
+            "/search?query=tennis&country=AU&page=4",
+            "/search?query=tennis&country=AU&page=5",
+            "/search?query=tennis&country=AU&page=6",
+            "/search?query=tennis&country=AU&page=7"
+
+            ],
+        "filename": "tennis_products_au"
+    },
+    {
+        "description": "Tennis Products - Canada",
+        "country_name": "Canada",
+        "country_code": "CA",
+        "endpoints": [
+            "/search?query=tennis&country=CA&page=1",
+            "/search?query=tennis&country=CA&page=2",
+            "/search?query=tennis&country=CA&page=3",
+            "/search?query=tennis&country=CA&page=4",
+            "/search?query=tennis&country=CA&page=5",
+            "/search?query=tennis&country=CA&page=6",
+            "/search?query=tennis&country=CA&page=7"
+
+            ],
+        "filename": "tennis_products_ca"
+    },
+    {
+        "description": "Tennis Products - China",
+        "country_name": "China",
+        "country_code": "CN",
+        "endpoints": [
+            "/search?query=tennis&country=CN&page=1",
+            "/search?query=tennis&country=CN&page=2",
+            "/search?query=tennis&country=CN&page=3",
+            "/search?query=tennis&country=CN&page=4",
+            "/search?query=tennis&country=CN&page=5",
+            "/search?query=tennis&country=CN&page=6",
+            "/search?query=tennis&country=CN&page=7"
+
+            ],
+        "filename": "tennis_products_cn"
+    },
+    {
+        "description": "Tennis Products - France",
+        "country_name": "France",
+        "country_code": "FR",
+        "endpoints": [
+            "/search?query=tennis&country=FR&page=1",
+            "/search?query=tennis&country=FR&page=2",
+            "/search?query=tennis&country=FR&page=3",
+            "/search?query=tennis&country=FR&page=4",
+            "/search?query=tennis&country=FR&page=5",
+            "/search?query=tennis&country=FR&page=6",
+            "/search?query=tennis&country=FR&page=7"
+
+            ],
+        "filename": "tennis_products_fr"
+    },
+    {
+        "description": "Tennis Products - Germany",
+        "country_name": "Germany",
+        "country_code": "DE",
+        "endpoints": [
+            "/search?query=tennis&country=DE&page=1",
+            "/search?query=tennis&country=DE&page=2",
+            "/search?query=tennis&country=DE&page=3",
+            "/search?query=tennis&country=DE&page=4",
+            "/search?query=tennis&country=DE&page=5",
+            "/search?query=tennis&country=DE&page=6",
+            "/search?query=tennis&country=DE&page=7"
+
+            ],
+        "filename": "tennis_products_de"
+    },
+    {
+        "description": "Tennis Products - Italy",
+        "country_name": "Italy",
+        "country_code": "IT",
+        "endpoints": [
+            "/search?query=tennis&country=IT&page=1",
+            "/search?query=tennis&country=IT&page=2",
+            "/search?query=tennis&country=IT&page=3",
+            "/search?query=tennis&country=IT&page=4",
+            "/search?query=tennis&country=IT&page=5",
+            "/search?query=tennis&country=IT&page=6",
+            "/search?query=tennis&country=IT&page=7"
+
+            ],
+        "filename": "tennis_products_it"
+    },
+    {
+        "description": "Tennis Products - Netherlands",
+        "country_name": "Netherlands",
+        "country_code": "NL",
+        "endpoints": [
+            "/search?query=tennis&country=NL&page=1",
+            "/search?query=tennis&country=NL&page=2",
+            "/search?query=tennis&country=NL&page=3",
+            "/search?query=tennis&country=NL&page=4",
+            "/search?query=tennis&country=NL&page=5",
+            "/search?query=tennis&country=NL&page=6",
+            "/search?query=tennis&country=NL&page=7"
+
+            ],
+        "filename": "tennis_products_nl"
+    },
+    {
+        "description": "Tennis Products - Singapore",
+        "country_name": "Singapore",
+        "country_code": "SG",
+        "endpoints": [
+            "/search?query=tennis&country=SG&page=1",
+            "/search?query=tennis&country=SG&page=2",
+            "/search?query=tennis&country=SG&page=3",
+            "/search?query=tennis&country=SG&page=4",
+            "/search?query=tennis&country=SG&page=5",
+            "/search?query=tennis&country=SG&page=6",
+            "/search?query=tennis&country=SG&page=7"
+
+            ],
+        "filename": "tennis_products_sg"
+    },
+    {
+        "description": "Tennis Products - Spain",
+        "country_name": "Spain",
+        "country_code": "ES",
+        "endpoints": [
+            "/search?query=tennis&country=ES&page=1",
+            "/search?query=tennis&country=ES&page=2",
+            "/search?query=tennis&country=ES&page=3",
+            "/search?query=tennis&country=ES&page=4",
+            "/search?query=tennis&country=ES&page=5",
+            "/search?query=tennis&country=ES&page=6",
+            "/search?query=tennis&country=ES&page=7"
+
+            ],
+        "filename": "tennis_products_es"
+    },
+
+    {
+        "description": "Tennis Products - United Kingdom",
+        "country_name": "United Kingdom",
+        "country_code": "GB",
+        "endpoints": [
+            "/search?query=tennis&country=GB&page=1",
+            "/search?query=tennis&country=GB&page=2",
+            "/search?query=tennis&country=GB&page=3",
+            "/search?query=tennis&country=GB&page=4",
+            "/search?query=tennis&country=GB&page=5",
+            "/search?query=tennis&country=GB&page=6",
+            "/search?query=tennis&country=GB&page=7"
+
+            ],
+        "filename": "tennis_products_gb"
+    },
+    {
+        "description": "Tennis Products - Japan",
+        "country_name": "Japan",
+        "country_code": "JP",
+        "endpoints": [
+            "/search?query=tennis&country=JP&page=1",
+            "/search?query=tennis&country=JP&page=2",
+            "/search?query=tennis&country=JP&page=3",
+            "/search?query=tennis&country=JP&page=4",
+            "/search?query=tennis&country=JP&page=5",
+            "/search?query=tennis&country=JP&page=6",
+            "/search?query=tennis&country=JP&page=7"
+
+            ],
+        "filename": "tennis_products_jp"
+    },
+    {
+        "description": "Tennis Products - Sweden",
+        "country_name": "Sweden",
+        "country_code": "SE",
+        "endpoints": [
+            "/search?query=tennis&country=SE&page=1",
+            "/search?query=tennis&country=SE&page=2",
+            "/search?query=tennis&country=SE&page=3",
+            "/search?query=tennis&country=SE&page=4",
+            "/search?query=tennis&country=SE&page=5",
+            "/search?query=tennis&country=SE&page=6",
+            "/search?query=tennis&country=SE&page=7"
+
+            ],
+        "filename": "tennis_products_se"
+    },
+    {
+        "description": "Tennis Products - Belgium",
+        "country_name": "Belgium",
+        "country_code": "BE",
+        "endpoints": [
+            "/search?query=tennis&country=BE&page=1",
+            "/search?query=tennis&country=BE&page=2",
+            "/search?query=tennis&country=BE&page=3",
+            "/search?query=tennis&country=BE&page=4",
+            "/search?query=tennis&country=BE&page=5",
+            "/search?query=tennis&country=BE&page=6",
+            "/search?query=tennis&country=BE&page=7"
+
+            ],
+        "filename": "tennis_products_be"
+    }
+]
