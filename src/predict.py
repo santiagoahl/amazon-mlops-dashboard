@@ -49,6 +49,7 @@ logging.basicConfig(
 logger = logging.getLogger(name="Logger")
 logger.setLevel(logging.INFO)
 
+
 def import_data(location: Location = Location()) -> pd.DataFrame:   
     """
     Description.

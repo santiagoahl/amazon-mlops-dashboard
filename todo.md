@@ -1,5 +1,9 @@
 # TODO
 
+# @bugfixing
+
+* [ ] Logger is not working
+
 ## Milestone 1: Get data
 
 * [X] Get a scope of which data can be tracked
@@ -37,7 +41,11 @@
 * [X] Automate Data Preprocessing
   * [X] Cleaning + Gaussian Noise
   * [X] Data Augmentation
-  * [ ] Include files with categorical info (A possible solution is to filter numerical columns in each script)
+  * [X] Include files with categorical info (A possible solution is to filter numerical columns in each script)
 * [X] Automate ML Modeling
   * [X] Train
-  * [ ] Inferences
+  * [X] Inferences
+
+# Milestone 4: Streamlit
+
+* [ ] Learn Streamlit

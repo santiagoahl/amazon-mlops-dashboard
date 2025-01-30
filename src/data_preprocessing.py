@@ -351,7 +351,7 @@ def knn_linear(
     return df_augmented
 
 #@task
-def augment_data(aug_factor: float = 20.0, location: Location = Location()) -> pd.DataFrame:   
+def augment_data(aug_factor: float = 10.0, location: Location = Location()) -> pd.DataFrame:   
     """
     Creates synthetic samples using KDE.
 
